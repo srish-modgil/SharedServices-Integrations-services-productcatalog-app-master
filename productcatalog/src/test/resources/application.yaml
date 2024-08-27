@@ -1,0 +1,95 @@
+server:
+  connection-timeout: 5s
+  tomcat:
+    mbeanregistry:
+      enabled: true
+  max-http-header-size: 20KB
+# https://springdoc.org/faq.html#_how_can_i_disable_the_try_it_out_button
+
+springdoc:
+  swagger-ui:
+    supportedSubmitMethods: "get,put,post,delete"
+sephora:
+  endpoint:
+    configprop:
+      sensitive: true
+      additional-keys-to-sanitize: .*saslJaasConfig.*
+    env:
+      sensitive: true
+      additional-keys-to-sanitize: .*saslJaasConfig.*
+  warmup:
+    enabled: false
+
+kafka:
+  bootstrap: "pkc-x7v5k.eastus2.azure.confluent.cloud:9092"
+  saslJaasConfig: org.apache.kafka.common.security.plain.PlainLoginModule required username="VIQGLF6XEENOBTFR" password="H73yQNkZNlU8wXuc1A30b9OkEen9zKpy36eacv9Fsbxbwy3UUWs2V/clXzodTWP0";
+  topicName: Sephora.PXM.Catalog
+  groupId: product-catalog-agg-test2 
+  enableProducerCreation: false
+  autoOffsetReset: earliest
+  maxPollRecords: 1000
+  valueDeSerializer: org.apache.kafka.common.serialization.StringSerializer
+  topicCatalog: Sephora.PXM.Catalog
+  topicPrice: Sephora.ESB.EffectiveSkuPricing
+  topicBV: Sephora.ESB.ProductSummary
+  url: https://qa3.sephora.com
+  targetTopic: Sephora.ESB.Product
+  maxReqSize: 2097164
+  
+spring:
+  web:
+    ignoreAutoConfiguredSkipPatterns: true
+  cloud:
+    kubernetes:
+      enables: false
+      discovery:
+        enabled: false
+    httpclientfactories:
+      apache:
+        enabled: false
+
+  main.allow-bean-definition-overriding: true
+
+discovery:
+  client:
+    currentServiceId: p13n-lookback-svc
+
+request:
+  log:
+    jsonBodies: true
+    maxPayloadLength: 1000
+    excludeUrlPatterns: '/actuator/health,/actuator/liveness,/actuator/prometheus'
+
+management:
+  server:
+    port: 8080
+  endpoint:
+    restart:
+      enabled: true
+  health:
+    azure-key-vault:
+      enabled: false
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  #          - loggers
+  #          - health
+  #          - caches
+  #          - liveness
+  #          - prometheus
+  metrics:
+    tags:
+      app: ${spring.application.name}
+    distribution:
+      percentiles-histogram:
+        http.server:
+          requests: true
+      percentiles:
+        http.server:
+          requests: 0.5, 0.75, 0.90, 0.95, 0.99
+
+mock:
+  server:
+    base:
+      url: "http://commerce-mock-service-perf1.eus1-omni-perf.internalsephora.com"
